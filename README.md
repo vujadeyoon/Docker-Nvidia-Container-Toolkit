@@ -2,85 +2,98 @@
 
 
 ## Table of contents
-  1. [Notice](#notice)
-  2. [Summarized environments about the Docker with the Nvidia Container Toolkit](#envs)
-  3. [How to install the docker](#installation_docker)
-  4. [How to install the Nvidia Container Toolkit](#installation_nct)
-  5. [Docker image](#docker_image)
-  6. [Docker container](#docker_container)
-  7. [Reference](#ref)
-  
+1. [Notice](#notice)
+2. [Summarized environments about the Docker with the Nvidia Container Toolkit](#env)
+3. [How to install the docker](#installation_docker)
+4. [How to install the NVIDIA Container Toolkit ](#installation_cnt)
+5. [Docker image](#docker-image)
+6. [Docker container](#docker_container)
+7. [Reference](#ref)
 
 
 ## 1. Notice <a name="notice"></a>
-- A guide for Docker with the Nvidia Container Toolkit (i.e. Nvidia-Docker 2.0)
+- A guide for Docker with the Nvidia Container Toolkit
 - I recommend that you should ignore the commented instructions with an octothorpe, #.
-- Modified date: Dec. 22, 2020.
 
 
 ## 2. Summarized environments about the Docker with the Nvidia Container Toolkit <a name="envs"></a>
-- Operating System (OS): Ubuntu MATE 18.04.3 LTS (Bionic)
+- Operating System (OS): Ubuntu MATE 24.04.3 LTS
 - Graphics Processing Unit (GPU): NVIDIA TITAN Xp, 1ea
-- GPU driver: Nvidia-440.100
-- CUDA toolkit: CUDA 10.2
-- cuDNN: cuDNN v7.6.5
-- Docker: Docker version 20.10.1, build 831ebea
-- Docker image: nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
-
+- GPU driver: NVIDIA-580.02.09
+- CUDA toolkit: 12.8
+- cuDNN: 9.13.1
+- Docker: Docker version 28.5.0, build 887030f
 
 
 ## 3. How to install the docker <a name="installation_docker"></a>
 1. Docker installation.<br />
     ```bash
-    usrname@hostname:~/curr_path$ curl https://get.docker.com | sh
-    usrname@hostname:~/curr_path$ sudo systemctl start docker && sudo systemctl enable docker
+    $ curl https://get.docker.com | sh
+    $ sudo systemctl start docker && sudo systemctl enable docker
     ```
 
 2. Check the docker version.<br />
     ```bash
-    usrname@hostname:~/curr_path$ sudo docker --version
+    $ sudo docker --version
     ```
     ```bash
-    Docker version 20.10.1, build 831ebea
-    ```
-
-
-## 4. How to install the Nvidia Container Toolkit <a name="installation_nct"></a>
-1. Setup the repository and the Gnu Privacy Guard (GPU) key.<br />
-    ```bash
-    usrname@hostname:~/curr_path$ distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-    usrname@hostname:~/curr_path$ curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
-    usrname@hostname:~/curr_path$ curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
-    usrname@hostname:~/curr_path$ sudo apt-get update
+        Docker version 28.5.0, build 887030f
     ```
 
-2. Install the Nvidia-Docker 2.0 for the Nvidia Container Toolkit.<br />
+
+## 4. How to install the NVIDIA Container Toolkit <a name="installation_nct"></a>
+1. How to install the NVIDIA Container Toolkit.<br />
     ```bash
-    usrname@hostname:~/curr_path$ sudo apt-get install -y nvidia-docker2
-    usrname@hostname:~/curr_path$ sudo systemctl restart docker
+    $ curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    $ sudo sed -i -e '/experimental/ s/^#//g' /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    $ sudo apt-get update
+    $ export NVIDIA_CONTAINER_TOOLKIT_VERSION=1.17.8-1
+    $ sudo apt-get install -y \
+      nvidia-container-toolkit=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+      nvidia-container-toolkit-base=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+      libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+      libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}
     ```
 
-3. Test the Nviida-Docker 2.0.<br />
+2. How to test the NVIDIA Container Toolkit.<br />
     ```bash
-    usrname@hostname:~/curr_path$ sudo docker run --rm --gpus all nvidia/cuda:10.2-base nvidia-smi
+    $ sudo docker run --rm --gpus all nvidia/cuda:13.0.1-cudnn-devel-ubuntu24.04 nvidia-smi
     ```
     ```bash
-    Tue Dec 22 08:40:19 2020
-    +-----------------------------------------------------------------------------+
-    | NVIDIA-SMI 440.100      Driver Version: 440.100      CUDA Version: 10.2     |
-    |-------------------------------+----------------------+----------------------+
-    | GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
-    | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
-    |===============================+======================+======================|
-    |   0  TITAN Xp            Off  | 00000000:01:00.0  On |                  N/A |
-    | 23%   30C    P8    10W / 250W |    518MiB / 12192MiB |      0%      Default |
-    +-------------------------------+----------------------+----------------------+
-                                                                                
-    +-----------------------------------------------------------------------------+
-    | Processes:                                                       GPU Memory |
-    |  GPU       PID   Type   Process name                             Usage      |
-    |=============================================================================|
-    +-----------------------------------------------------------------------------+
+    ==========
+    == CUDA ==
+    ==========
+
+    CUDA Version 13.0.1
+
+    Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
+    This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+    By pulling and using the container, you accept the terms and conditions of this license:
+    https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+
+    A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
+
+    Tue Oct  7 16:22:36 2025       
+    +-----------------------------------------------------------------------------------------+
+    | NVIDIA-SMI 580.82.09              Driver Version: 580.82.09      CUDA Version: 13.0     |
+    +-----------------------------------------+------------------------+----------------------+
+    | GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+    | Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+    |                                         |                        |               MIG M. |
+    |=========================================+========================+======================|
+    |   0  NVIDIA TITAN Xp                Off |   00000000:02:00.0  On |                  N/A |
+    | 23%   38C    P8             19W /  250W |     353MiB /  12288MiB |      8%      Default |
+    |                                         |                        |                  N/A |
+    +-----------------------------------------+------------------------+----------------------+
+
+    +-----------------------------------------------------------------------------------------+
+    | Processes:                                                                              |
+    |  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+    |        ID   ID                                                               Usage      |
+    |=========================================================================================|
+    |  No running processes found                                                             |
+    +-----------------------------------------------------------------------------------------+
     ```
 
 
